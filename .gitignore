@@ -1,3 +1,5 @@
 venv/
 wisconsin_breast/histograms/*
 .idea/*
+.DS_Store
+ml_utils/*pyc

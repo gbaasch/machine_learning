@@ -115,52 +115,61 @@ def generate_features(X):
 
 
 def train_predict_evaluate(X_train, X_test, y_train, y_test, type_arr):
-    for x in type_arr:
-        type = Model[x]
-        if type == "LOGISTIC_REGRESSION":
-            X_train, X_test = preprocess_data(X_train, X_test, "S")
-            model = linear_model.LogisticRegression()
-        if type == "SVC":
-            model = sklearn.svm.SVC()
-        if type == "DECISION_TREE":
-            model = tree.DecisionTreeClassifier(max_depth=2)
-        if type == "ADABOOST":
-            model = ensemble.AdaBoostClassifier(n_estimators=3)
-        if type == "GRADIENT_BOOSTING_REGRESSOR":
-            model = ensemble.GradientBoostingRegressor()
+    for model_type in type_arr:
+        model = train(X_train, y_train, X_test, model_type)
+        predictions_train = predict(X_train, model)
+        predictions_val = predict(X_test, model)
+        evaluate(X_train, y_train, predictions_train, predictions_val, X_test, y_test, model, model_type)
 
-        fit = model.fit(X_train, y_train)
 
-        if type == "DECISION_TREE":
-            tree.export_graphviz(fit, out_file='tree.dot')
 
-        predictions_train = model.predict(X_train)
-        predictions_val = model.predict(X_test)
+def train(X_train, y_train, X_test, model_type):
+    print model_type
+    model_type = Model[model_type]
+    if model_type == "LOGISTIC_REGRESSION":
+        X_train, X_test = preprocess_data(X_train, X_test, "S")
+        model = linear_model.LogisticRegression()
+    if model_type == "SVC":
+        model = sklearn.svm.SVC()
+    if model_type == "DECISION_TREE":
+        model = tree.DecisionTreeClassifier(max_depth=2)
+    if model_type == "ADABOOST":
+        model = ensemble.AdaBoostClassifier(n_estimators=3)
+    if model_type == "GRADIENT_BOOSTING_REGRESSOR":
+        model = ensemble.GradientBoostingRegressor()
 
-        tn, fp, fn, tp = metrics.confusion_matrix(
-            predictions_val, y_test
-        ).ravel()
+    return model.fit(X_train, y_train)
 
-        with open(type + "_predictions.csv", "w") as writefile:
-            wf = csv.writer(writefile)
-            wf.writerow(predictions_train)
 
-        # print("True Negative: {} \n False Postitve: {} \n False Negative: {} \n "
-        #       "True Positive: {}".format(tn, fp, fn, tp))
-        n = fp + fn
-        d = fp + fn + tp + tn
-        ce = (n / d) * 100
-        print("===================== TYPE: {} ==================".format(type))
-        print("False positives: {} ".format(fp))
-        print("False negatives: {} ".format(fn))
-        print("Classification Error: {} %".format(ce))
+def predict(X, model):
+    return model.predict(X)
 
-        print("MSE on training data ", MSE(y_train, predictions_train))
-        print("MSE on test data ", MSE(y_test, predictions_val))
-        print("\n")
-        print("error on training data", 1 - model.score(X_train, y_train))
-        print("error on test data", 1 - model.score(X_test, y_test))
-        print("\n\n")
+
+def evaluate(X_train, y_train, predictions_train, predictions_val, X_test, y_test, model, model_type):
+    tn, fp, fn, tp = metrics.confusion_matrix(
+        predictions_val, y_test
+    ).ravel()
+
+    with open(model_type + "_predictions.csv", "w") as writefile:
+        wf = csv.writer(writefile)
+        wf.writerow(predictions_train)
+
+    # print("True Negative: {} \n False Postitve: {} \n False Negative: {} \n "
+    #       "True Positive: {}".format(tn, fp, fn, tp))
+    n = fp + fn
+    d = fp + fn + tp + tn
+    ce = (n / d) * 100
+    print("===================== TYPE: {} ==================".format(type))
+    print("False positives: {} ".format(fp))
+    print("False negatives: {} ".format(fn))
+    print("Classification Error: {} %".format(ce))
+
+    print("MSE on training data ", MSE(y_train, predictions_train))
+    print("MSE on test data ", MSE(y_test, predictions_val))
+    print("\n")
+    print("error on training data", 1 - model.score(X_train, y_train))
+    print("error on test data", 1 - model.score(X_test, y_test))
+    print("\n\n")
 
 
 def run(train_X, train_y, val_X, val_y):
