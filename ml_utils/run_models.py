@@ -116,15 +116,18 @@ def generate_features(X):
 
 def train_predict_evaluate(X_train, X_test, y_train, y_test, type_arr):
     for model_type in type_arr:
-        model = train(X_train, y_train, X_test, model_type)
-        predictions_train = predict(X_train, model)
-        predictions_val = predict(X_test, model)
+        predictions_train, predictions_val, model = train_and_predict(X_train, y_train, X_test, model_type)
         evaluate(X_train, y_train, predictions_train, predictions_val, X_test, y_test, model, model_type)
 
 
+def train_and_predict(X_train, y_train, X_test, model_type):
+    model = train(X_train, y_train, X_test, model_type)
+    predictions_train = predict(X_train, model)
+    predictions_val = predict(X_test, model)
+    return predictions_train, predictions_val, model
+
 
 def train(X_train, y_train, X_test, model_type):
-    print model_type
     model_type = Model[model_type]
     if model_type == "LOGISTIC_REGRESSION":
         X_train, X_test = preprocess_data(X_train, X_test, "S")
