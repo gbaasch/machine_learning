@@ -118,6 +118,7 @@ def train_predict_evaluate(X_train, X_test, y_train, y_test, type_arr):
     for x in type_arr:
         type = Model[x]
         if type == "LOGISTIC_REGRESSION":
+            X_train, X_test = preprocess_data(X_train, X_test, "S")
             model = linear_model.LogisticRegression()
         if type == "SVC":
             model = sklearn.svm.SVC()
@@ -150,6 +151,8 @@ def train_predict_evaluate(X_train, X_test, y_train, y_test, type_arr):
         d = fp + fn + tp + tn
         ce = (n / d) * 100
         print("===================== TYPE: {} ==================".format(type))
+        print("False positives: {} ".format(fp))
+        print("False negatives: {} ".format(fn))
         print("Classification Error: {} %".format(ce))
 
         print("MSE on training data ", MSE(y_train, predictions_train))
@@ -176,6 +179,7 @@ def run(train_X, train_y, val_X, val_y):
         train_X, val_X, train_y, val_y, ["LR", "DT", "ADA"]
     )
 
+
 HandleMissing = {
     "D": "DROP",
     "I": "IMPUTE",
@@ -190,6 +194,7 @@ Preprocess = {
 
 Model = {
     "LR": "LOGISTIC_REGRESSION",
+    "SVC": "SVC",
     "DT": "DECISION_TREE",
     "ADA": "ADABOOST",
     "GB": "GRADIENT_BOOSTING_REGRESSOR"
