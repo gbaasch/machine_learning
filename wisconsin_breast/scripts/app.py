@@ -16,8 +16,8 @@ def main():
         train_X, val_X, train_y, val_y,
         ["LR", "SVC", "DT", "ADA"])
 
-    plot_features_against_residuals(train_X, train_y,
-                                    predictions, VIS_RESIDUALS_DIR)
+    plot_features_against_residuals(
+        train_X, train_y, predictions, VIS_RESIDUALS_DIR)
 
     print("DONE")
 
