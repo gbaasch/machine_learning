@@ -44,6 +44,7 @@ def clean_data(X_train, X_val, y_train, y_val, type):
 
 
 def preprocess_data(X_train, X_val, type):
+    type = Preprocess[type]
     if type == "SCALE":
         X_train = preprocessing.scale(X_train)
         X_val = preprocessing.scale(X_val)
@@ -99,15 +100,6 @@ def visualize(dataframe):
 def compare_models():
     # TODO plot confidence intervals, accuracy, confusion matrix
     return
-
-
-def select_features(X):
-    x = np.append(X[:,1].reshape(-1, 1), X[:,6].reshape(-1, 1), axis=1)
-    x = np.append(x, X[:, 7].reshape(-1, 1), axis=1)
-    x = np.append(x, X[:, 15].reshape(-1, 1), axis=1)
-    x = np.append(x, X[:, 31].reshape(-1, 1), axis=1)
-    x = np.append(x, X[:, 29].reshape(-1, 1), axis=1)
-    return x
 
 
 def generate_features(X):
@@ -174,22 +166,15 @@ def run(train_X, train_y, val_X, val_y):
     )
 
     train_X, val_X = preprocess_data(
-        train_X, val_X, Preprocess["MM"]
+        train_X, val_X, "MM"
     )
 
-    train_X = generate_features(train_X,)
-    val_X = generate_features(val_X)
-    #
-    # print("SHAPE: " + str(X_train.shape[0]) + " " + str(X_train.shape[1]))
-    train_X = select_features(train_X)
-    val_X = select_features(val_X)
+    # train_X = generate_features(train_X,)
+    # val_X = generate_features(val_X)
 
     train_predict_evaluate(
         train_X, val_X, train_y, val_y, ["LR", "DT", "ADA"]
     )
-
-    # NormalizeAndPlot(X_train, y_train, train)
-
 
 HandleMissing = {
     "D": "DROP",
